@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# misc
+.DS_Store
+*.pem
+
+# local
+.idea
+.vscode
