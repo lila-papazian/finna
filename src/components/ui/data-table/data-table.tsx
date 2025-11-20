@@ -2,7 +2,7 @@
 "use no memo";
 
 import React from "react";
-import { columns } from "./columns";
+
 import {
   useReactTable,
   getCoreRowModel,
@@ -13,6 +13,9 @@ import {
   ColumnFiltersState,
 } from "@tanstack/react-table";
 
+import { columns } from "./columns";
+
+// Components
 import {
   Table,
   TableBody,
@@ -21,7 +24,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,8 +40,13 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ChevronDown, ChevronsUpDown } from "lucide-react";
 
-import { ChevronDown } from "lucide-react";
 import { Expense } from "@/domains/expenses/model/expense";
 import { CATEGORIES } from "@/lib/storage";
 
@@ -66,11 +73,9 @@ export function DataTable({ data, accounts }: DataTableProps) {
   const [currencyFilter, setCurrencyFilter] = React.useState<string>("all");
   const [accountFilter, setAccountFilter] = React.useState<string>("all");
 
-  // Apply custom filters
   const filteredData = React.useMemo(() => {
     let filtered = [...data];
 
-    // Date filter
     const now = new Date();
     let startDate: Date, endDate: Date;
 
@@ -162,259 +167,275 @@ export function DataTable({ data, accounts }: DataTableProps) {
     <div className="w-full space-y-4">
       {/* Filters Section */}
       <div className="bg-white rounded-lg border p-4 space-y-4">
-        <h3 className="text-lg font-semibold">Filters</h3>
+        <Collapsible>
+          <CollapsibleTrigger className="flex items-center">
+            <h3 className="text-lg font-semibold">Filters</h3>
+            <Button variant="ghost" size="icon" className="size-8">
+              <ChevronsUpDown />
+              <span className="sr-only">Toggle</span>
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="flex gap-2 flex-wrap">
+              <Button
+                variant={dateFilter === "all" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDateFilter("all")}
+              >
+                All Time
+              </Button>
+              <Button
+                variant={dateFilter === "this-month" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDateFilter("this-month")}
+              >
+                This Month
+              </Button>
+              <Button
+                variant={dateFilter === "last-month" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDateFilter("last-month")}
+              >
+                Last Month
+              </Button>
+              <Button
+                variant={dateFilter === "custom" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDateFilter("custom")}
+              >
+                Custom Range
+              </Button>
+            </div>
 
-        {/* Quick Date Filters */}
-        <div className="flex gap-2 flex-wrap">
-          <Button
-            variant={dateFilter === "all" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setDateFilter("all")}
-          >
-            All Time
-          </Button>
-          <Button
-            variant={dateFilter === "this-month" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setDateFilter("this-month")}
-          >
-            This Month
-          </Button>
-          <Button
-            variant={dateFilter === "last-month" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setDateFilter("last-month")}
-          >
-            Last Month
-          </Button>
-          <Button
-            variant={dateFilter === "custom" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setDateFilter("custom")}
-          >
-            Custom Range
-          </Button>
-        </div>
+            {/* Custom Date Range */}
+            {dateFilter === "custom" && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label>Start Date</Label>
+                  <Input
+                    type="date"
+                    value={customStartDate}
+                    onChange={(e) => setCustomStartDate(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label>End Date</Label>
+                  <Input
+                    type="date"
+                    value={customEndDate}
+                    onChange={(e) => setCustomEndDate(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
 
-        {/* Custom Date Range */}
-        {dateFilter === "custom" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Filter Grid */}
+            <div className="grid grid-flow-col auto-cols-min md:auto-cols-min gap-4 py-8">
+              {/* Category Filter */}
+              <div>
+                <Label className="py-2">Category</Label>
+                <Select
+                  value={categoryFilter}
+                  onValueChange={setCategoryFilter}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {CATEGORIES.map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Currency Filter */}
+              <div>
+                <Label className="py-2">Currency</Label>
+                <Select
+                  value={currencyFilter}
+                  onValueChange={setCurrencyFilter}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Currencies</SelectItem>
+                    <SelectItem value="ARS">ARS</SelectItem>
+                    <SelectItem value="USD">USD</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Account Filter */}
+              <div>
+                <Label className="py-2">Account</Label>
+                <Select value={accountFilter} onValueChange={setAccountFilter}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Accounts</SelectItem>
+                    {accounts.map((account) => (
+                      <SelectItem key={account.id} value={account.id}>
+                        {account.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Search by Description */}
             <div>
-              <Label>Start Date</Label>
+              <Label className="py-2">Search by Description</Label>
               <Input
-                type="date"
-                value={customStartDate}
-                onChange={(e) => setCustomStartDate(e.target.value)}
+                placeholder="Search expenses..."
+                value={
+                  (table
+                    .getColumn("description")
+                    ?.getFilterValue() as string) ?? ""
+                }
+                onChange={(event) =>
+                  table
+                    .getColumn("description")
+                    ?.setFilterValue(event.target.value)
+                }
               />
             </div>
-            <div>
-              <Label>End Date</Label>
-              <Input
-                type="date"
-                value={customEndDate}
-                onChange={(e) => setCustomEndDate(e.target.value)}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Filter Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Category Filter */}
-          <div>
-            <Label>Category</Label>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {CATEGORIES.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Currency Filter */}
-          <div>
-            <Label>Currency</Label>
-            <Select value={currencyFilter} onValueChange={setCurrencyFilter}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Currencies</SelectItem>
-                <SelectItem value="ARS">ARS</SelectItem>
-                <SelectItem value="USD">USD</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Account Filter */}
-          <div>
-            <Label>Account</Label>
-            <Select value={accountFilter} onValueChange={setAccountFilter}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Accounts</SelectItem>
-                {accounts.map((account) => (
-                  <SelectItem key={account.id} value={account.id}>
-                    {account.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* Search by Description */}
-        <div>
-          <Label>Search Description</Label>
-          <Input
-            placeholder="Search expenses..."
-            value={
-              (table.getColumn("description")?.getFilterValue() as string) ?? ""
-            }
-            onChange={(event) =>
-              table.getColumn("description")?.setFilterValue(event.target.value)
-            }
-          />
-        </div>
-
+          </CollapsibleContent>
+        </Collapsible>
         {/* Results Summary */}
         <div className="text-sm text-muted-foreground">
           Showing {filteredData.length} of {data.length} expenses
         </div>
-      </div>
-
-      {/* Column Visibility Toggle */}
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected
-        </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">
-              Columns <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table.getAllLeafColumns().map((column) => {
-              if (column.id === "select") return null;
-              return (
-                <DropdownMenuCheckboxItem
-                  key={column.id}
-                  className="capitalize"
-                  checked={column.getIsVisible()}
-                  onCheckedChange={(v) => column.toggleVisibility(!!v)}
-                >
-                  {column.id}
-                </DropdownMenuCheckboxItem>
-              );
-            })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      {/* Table */}
-      <div className="rounded-md border overflow-hidden">
-        <Table style={{ tableLayout: "fixed", width: "100%" }}>
-          <TableHeader>
-            {table.getHeaderGroups().map((hgroup) => (
-              <TableRow key={hgroup.id}>
-                {hgroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    style={{ width: `${header.getSize()}px` }}
+        {/* Column Visibility Toggle */}
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {table.getFilteredRowModel().rows.length} row(s) selected
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                Columns <ChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table.getAllLeafColumns().map((column) => {
+                if (column.id === "select") return null;
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(v) => column.toggleVisibility(!!v)}
                   >
-                    {header.isPlaceholder
-                      ? null
-                      : header.column.columnDef.header instanceof Function
-                      ? header.column.columnDef.header(header.getContext())
-                      : header.column.columnDef.header}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
-          <TableBody>
-            {table.getRowModel().rows.length > 0 ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      style={{ width: `${cell.column.getSize()}px` }}
+        {/* Table */}
+        <div className="rounded-md border overflow-hidden">
+          <Table style={{ tableLayout: "fixed", width: "100%" }}>
+            <TableHeader>
+              {table.getHeaderGroups().map((hgroup) => (
+                <TableRow key={hgroup.id}>
+                  {hgroup.headers.map((header) => (
+                    <TableHead
+                      key={header.id}
+                      style={{ width: `${header.getSize()}px` }}
                     >
-                      {cell.column.columnDef.cell instanceof Function
-                        ? cell.column.columnDef.cell(cell.getContext())
-                        : cell.getValue()}
-                    </TableCell>
+                      {header.isPlaceholder
+                        ? null
+                        : header.column.columnDef.header instanceof Function
+                        ? header.column.columnDef.header(header.getContext())
+                        : header.column.columnDef.header}
+                    </TableHead>
                   ))}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={table.getAllLeafColumns().length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              ))}
+            </TableHeader>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {table.getPageCount()}
+            <TableBody>
+              {table.getRowModel().rows.length > 0 ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        style={{ width: `${cell.column.getSize()}px` }}
+                      >
+                        {cell.column.columnDef.cell instanceof Function
+                          ? cell.column.columnDef.cell(cell.getContext())
+                          : cell.getValue()}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={table.getAllLeafColumns().length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-          >
-            First
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-          >
-            Last
-          </Button>
+
+        {/* Pagination */}
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            Page {table.getState().pagination.pageIndex + 1} of{" "}
+            {table.getPageCount()}
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.setPageIndex(0)}
+              disabled={!table.getCanPreviousPage()}
+            >
+              First
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+              disabled={!table.getCanNextPage()}
+            >
+              Last
+            </Button>
+          </div>
         </div>
-      </div>
+      </div>{" "}
     </div>
   );
 }
