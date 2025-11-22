@@ -313,6 +313,8 @@ const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
                           className="w-full justify-start text-left font-normal"
                           disabled={isSubmitting}
                           aria-disabled={isSubmitting}
+                          aria-haspopup="dialog"
+                          aria-controls="expense-date-calendar"
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {field.value ? (
@@ -324,7 +326,9 @@ const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
                       </PopoverTrigger>
                       <PopoverContent align="start" className="p-0">
                         <Calendar
+                          id="expense-date-calendar"
                           mode="single"
+                          autoFocus
                           selected={field.value}
                           onSelect={(date) => {
                             if (date) field.onChange(date);
