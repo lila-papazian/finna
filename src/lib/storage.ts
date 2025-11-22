@@ -2,19 +2,6 @@ import { Account } from "@/domains/accounts/model/account";
 import { Expense } from "@/domains/expenses/model/expense";
 import { ExpenseArraySchema } from "@/domains/expenses/schema/expense";
 
-export const CATEGORIES = [
-  "Food & Dining",
-  "Groceries",
-  "Transportation",
-  "Shopping",
-  "Bills & Utilities",
-  "Entertainment",
-  "Healthcare",
-  "Education",
-  "Travel",
-  "Other",
-] as const;
-
 export const storage = {
   getExpenses: (): Expense[] => {
     if (typeof window === "undefined") return [];

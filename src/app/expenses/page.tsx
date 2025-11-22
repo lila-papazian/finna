@@ -1,8 +1,8 @@
-"use client";
-
+import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table/data-table";
 import { Account } from "@/domains/accounts/model/account";
 import { Expense } from "@/domains/expenses/model/expense";
+import AddExpenseDialog from "@/domains/expenses/ui/add-expenses/add-expense-dialog";
 
 const mockData: Expense[] = [
   {
@@ -92,8 +92,8 @@ export default function ExpensesPage() {
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Expenses</h1>
         <p className="text-gray-600">Manage and track all your expenses</p>
       </div>
-
-      <DataTable data={mockData} accounts={mockAccounts}/>
+      <AddExpenseDialog trigger={<Button variant="outline">Add +</Button>} />
+      <DataTable data={mockData} accounts={mockAccounts} />
     </div>
   );
 }
