@@ -62,7 +62,7 @@ const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
     reset,
   } = useForm<NewExpenseForm>({
     resolver: zodResolver(NewExpenseFormSchema),
-    mode: "onChange",
+    mode: "onTouched",
     reValidateMode: "onChange",
     defaultValues: {
       amount: "",
@@ -165,12 +165,12 @@ const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
                       </span>
                     </FieldLabel>
                     <Select
-                      aria-labelledby="currency-label"
                       name={field.name}
                       value={field.value ?? ""}
                       onValueChange={(v) => field.onChange(v || undefined)}
                     >
                       <SelectTrigger
+                        aria-labelledby="currency-label"
                         className="border border-neutral-800 dark:border-neutral-700"
                         aria-invalid={fieldState.invalid}
                         aria-describedby={
@@ -179,7 +179,10 @@ const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
                         disabled={isSubmitting}
                         aria-disabled={isSubmitting}
                       >
-                        <SelectValue placeholder="Choose currency" />
+                        <SelectValue
+                          id="currency-trigger"
+                          placeholder="Choose currency"
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {DEFAULT_CURRENCIES.map((c) => (
@@ -209,13 +212,13 @@ const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
                       </span>
                     </FieldLabel>
                     <Select
-                      aria-labelledby="category-label"
                       name={field.name}
                       value={field.value ?? ""}
                       onValueChange={(v) => field.onChange(v || undefined)}
                     >
                       <SelectTrigger
                         className="border border-neutral-800 dark:border-neutral-700"
+                        aria-labelledby="category-label"
                         aria-invalid={fieldState.invalid}
                         aria-describedby={
                           fieldState.error ? `${field.name}-error` : undefined
@@ -254,12 +257,12 @@ const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
                       </span>
                     </FieldLabel>
                     <Select
-                      aria-labelledby="accountId-label"
                       name={field.name}
                       value={field.value ?? ""}
                       onValueChange={field.onChange}
                     >
                       <SelectTrigger
+                        aria-labelledby="accountId-label"
                         name={field.name}
                         aria-invalid={fieldState.invalid}
                         aria-describedby={
@@ -291,7 +294,7 @@ const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field>
-                    <FieldLabel id="date-label">
+                    <FieldLabel id="date-label" htmlFor="date">
                       Date
                       <span aria-hidden="true" className="text-red-500">
                         *
