@@ -1,5 +1,4 @@
 "use client";
-"use no memo";
 
 import React from "react";
 
@@ -48,7 +47,7 @@ import {
 import { ChevronDown, ChevronsUpDown } from "lucide-react";
 
 import { Expense } from "@/domains/expenses/model/expense";
-import { CATEGORIES } from "@/lib/storage";
+import { DEFAULT_CATEGORIES } from "@/lib/constants/categories";
 
 type DateFilter = "this-month" | "last-month" | "custom" | "all";
 
@@ -143,6 +142,7 @@ export function DataTable({ data, accounts }: DataTableProps) {
     accountFilter,
   ]);
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: filteredData,
     columns,
@@ -243,9 +243,9 @@ export function DataTable({ data, accounts }: DataTableProps) {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Categories</SelectItem>
-                    {CATEGORIES.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
-                        {cat}
+                    {DEFAULT_CATEGORIES.map((cat) => (
+                      <SelectItem key={cat.key} value={cat.key}>
+                        {cat.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
