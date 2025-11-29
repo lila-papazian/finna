@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/button";
 import { DataTable } from "@/components/ui/data-table/data-table";
 import { Account } from "@/domains/accounts/model/account";
 import { Expense } from "@/domains/expenses/model/expense";
@@ -77,7 +77,6 @@ const mockData: Expense[] = [
     currency: "ARS",
     accountId: "acc-333",
   },
-  
 ];
 
 const mockAccounts: Account[] = [
@@ -87,7 +86,7 @@ const mockAccounts: Account[] = [
 
 export default function ExpensesPage() {
   return (
-    <div className="max-w-7xl mx-auto p-8">
+    <div className="max-w-7xl mx-auto">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Expenses</h1>
         <p className="text-gray-600">Manage and track all your expenses</p>
