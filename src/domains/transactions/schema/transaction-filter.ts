@@ -1,3 +1,4 @@
+import { CurrencyEnumSchema } from "@/domains/currencies/schema/currency";
 import { z } from "zod";
 
 export const AmountFilterSchema = z.object({
@@ -10,12 +11,11 @@ export const DateRangeSchema = z.object({
   to: z.coerce.date(),
 }).refine((d) => d.from <= d.to, "Invalid date range");
 
-export const ExpenseFiltersSchema = z.object({
+export const TransactionFiltersSchema = z.object({
   amount: AmountFilterSchema.optional(),
-  currency: z.string().optional(),
+  currency: CurrencyEnumSchema.optional(),
   category: z.string().optional(),
   date: DateRangeSchema.optional(),
   accountId: z.string().optional(),
 });
 
-export type ExpenseFilters = z.infer<typeof ExpenseFiltersSchema>;

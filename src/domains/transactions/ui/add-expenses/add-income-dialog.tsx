@@ -1,8 +1,6 @@
 "use client";
 import { Controller, useForm } from "react-hook-form";
 import { format } from "date-fns";
-import { createExpense } from "../../actions/expenses-actions";
-import { NewExpense, NewExpenseForm } from "../../model/expense";
 import { DEFAULT_CATEGORIES } from "@/lib/constants/categories";
 import { DEFAULT_CURRENCIES } from "@/lib/constants/currencies";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,9 +37,11 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/popover";
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { Calendar } from "@/components/calendar";
-import { NewExpenseFormSchema } from "../../schema/expense";
+import { NewIncomeFormSchema } from "@/domains/transactions/schema/income";
+import { NewIncome, NewIncomeForm } from "@/domains/transactions/model/income";
+import { storage } from "@/lib/storage";
 
-const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
+const AddIncomeDialog = ({ trigger }: { trigger: React.ReactNode }) => {
   const [open, setOpen] = useState(false);
 
   const handleOpenChange = (open: boolean) => {
@@ -56,8 +56,8 @@ const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
     formState: { isSubmitting, isValid },
     control,
     reset,
-  } = useForm<NewExpenseForm>({
-    resolver: zodResolver(NewExpenseFormSchema),
+  } = useForm<NewIncomeForm>({
+    resolver: zodResolver(NewIncomeFormSchema),
     mode: "onTouched",
     reValidateMode: "onChange",
     defaultValues: {
@@ -70,26 +70,23 @@ const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
     },
   });
 
-  function convertToNewExpense(data: NewExpenseForm): NewExpense {
-    return {
-      amount: Number(data.amount),
-      currency: data.currency,
-      category: data.category,
-      accountId: data.accountId,
-      date: data.date,
-      description: data.description || undefined,
+  async function onSubmit(data: NewIncomeForm) {
+    const newIncome: NewIncome = {
+      type: "income",
+      amount: parseFloat(data.amount),
+      currency: data.currency!,
+      category: data.category!,
+      accountId: data.accountId!,
+      description: data.description?.trim() || undefined,
+      date: data.date!,
     };
-  }
-
-  async function onSubmit(values: NewExpenseForm) {
-    try {
-      const payload = convertToNewExpense(values);
-      await createExpense(payload);
-      reset();
-      setOpen(false);
-    } catch (error) {
-      console.error("Failed to create expense:", error);
-    }
+    storage.addIncome(newIncome);
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        resolve();
+        handleOpenChange(false);
+      }, 2000);
+    });
   }
 
   return (
@@ -97,9 +94,9 @@ const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="max-h-[80vh] max-w-[80vw] overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-80">
         <DialogHeader>
-          <DialogTitle>Add Expense</DialogTitle>
+          <DialogTitle>Add Income</DialogTitle>
           <DialogDescription>
-            Fill in the details below to add a new expense.
+            Fill in the details below to add a new income.
           </DialogDescription>
         </DialogHeader>
 
@@ -247,7 +244,7 @@ const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
                 render={({ field, fieldState }) => (
                   <Field>
                     <FieldLabel htmlFor="accountId" id="accountId-label">
-                      Origin account
+                      Destination account
                       <span aria-hidden="true" className="text-red-500">
                         *
                       </span>
@@ -352,13 +349,13 @@ const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
                     <FieldContent>
                       <FieldLabel htmlFor="description">Description</FieldLabel>
                       <FieldDescription id="description-help">
-                        Optional description for this expense (max 100
+                        Optional description for this income (max 100
                         characters).
                       </FieldDescription>
                     </FieldContent>
                     <Textarea
                       id="description"
-                      placeholder="Coffee with the team..."
+                      placeholder="Month wages..."
                       className="resize-none h-auto border border-neutral-800 dark:border-neutral-700"
                       {...field}
                       aria-invalid={fieldState.invalid}
@@ -415,4 +412,4 @@ const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
   );
 };
 
-export default AddExpenseDialog;
+export default AddIncomeDialog;

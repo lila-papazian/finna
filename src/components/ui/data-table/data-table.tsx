@@ -45,14 +45,13 @@ import {
   CollapsibleTrigger,
 } from "@/components/collapsible";
 import { ChevronDown, ChevronsUpDown } from "lucide-react";
-
-import { Expense } from "@/domains/expenses/model/expense";
 import { DEFAULT_CATEGORIES } from "@/lib/constants/categories";
+import { Transaction } from "@/domains/transactions/model/transaction";
 
 type DateFilter = "this-month" | "last-month" | "custom" | "all";
 
 interface DataTableProps {
-  data: Expense[];
+  data: Transaction[];
   accounts: Array<{ id: string; name: string }>;
 }
 

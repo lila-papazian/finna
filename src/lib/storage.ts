@@ -1,46 +1,40 @@
 import { Account } from "@/domains/accounts/model/account";
-import { Expense } from "@/domains/expenses/model/expense";
-import { ExpenseArraySchema } from "@/domains/expenses/schema/expense";
+import { NewTransaction, Transaction } from "@/domains/transactions/model/transaction";
+import { ExpenseArraySchema } from "@/domains/transactions/schema/expense";
+
 
 export const storage = {
-  getExpenses: (): Expense[] => {
-    if (typeof window === "undefined") return [];
+
+  // Transactions
+  getTransactions: ():Transaction[] => {
+      if (typeof window === "undefined") return [];
     try {
-      const raw = JSON.parse(localStorage.getItem("finna_expenses") || "[]");
+      const raw = JSON.parse(localStorage.getItem("finna_transactions") || "[]");
       return ExpenseArraySchema.parse(raw);
     } catch {
       return [];
     }
   },
 
-  addExpense: (expense: Omit<Expense, "id">): Expense => {
-    const expenses = storage.getExpenses();
-    const newExpense = {
-      ...expense,
+ addTransaction: (transaction: NewTransaction): void => {
+    const expenses = storage.getTransactions();
+    const newTransaction = {
+      ...transaction,
       id: crypto.randomUUID(),
     };
-    expenses.push(newExpense);
-    localStorage.setItem("finna_expenses", JSON.stringify(expenses));
-    return newExpense;
+    expenses.push(newTransaction);
+    localStorage.setItem("finna_transactions", JSON.stringify(expenses));
   },
 
-  updateExpense: (id: string, updates: Partial<Expense>): void => {
-    const expenses = storage.getExpenses();
-    const index = expenses.findIndex((e) => e.id === id);
-    if (index !== -1) {
-      expenses[index] = { ...expenses[index], ...updates };
-      localStorage.setItem("finna_expenses", JSON.stringify(expenses));
-    }
+
+  deleteTransaction: (id: string): void => {
+    const expenses = storage.getTransactions().filter((e) => e.id !== id);
+    localStorage.setItem("finna_transactions", JSON.stringify(expenses));
   },
 
-  deleteExpense: (id: string): void => {
-    const expenses = storage.getExpenses().filter((e) => e.id !== id);
-    localStorage.setItem("finna_expenses", JSON.stringify(expenses));
-  },
-
-  deleteExpenses: (ids: string[]): void => {
-    const expenses = storage.getExpenses().filter((e) => !ids.includes(e.id));
-    localStorage.setItem("finna_expenses", JSON.stringify(expenses));
+  deleteTransactions: (ids: string[]): void => {
+    const expenses = storage.getTransactions().filter((e) => !ids.includes(e.id));
+    localStorage.setItem("finna_transactions", JSON.stringify(expenses));
   },
 
   // Accounts

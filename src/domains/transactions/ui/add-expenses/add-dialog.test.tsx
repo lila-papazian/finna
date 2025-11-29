@@ -7,7 +7,7 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import AddExpenseDialog from "./add-expense-dialog";
-import { createExpense } from "../../actions/expenses-actions";
+import { createExpense } from "../../../expenses/actions/expenses-actions";
 import { format } from "date-fns";
 jest.mock("../../actions/expenses-actions", () => ({
   createExpense: jest.fn(),

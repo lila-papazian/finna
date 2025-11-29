@@ -1,6 +1,21 @@
-import z from "zod";
-import { DEFAULT_CATEGORIES } from "@/lib/constants/categories";
+import * as z from "zod";
 
-export const CategoryEnum = z.enum(
-  DEFAULT_CATEGORIES.map(c => c.key) as [string, ...string[]]
-);
+export const ExpenseCategoryEnum = z.enum([
+  "Food",
+  "Transport",
+  "Entertainment",
+  "Bills",
+  "Shopping",
+  "Other",
+]);
+
+export const IncomeCategoryEnum = z.enum([
+  "Salary",
+  "Freelance",
+  "Investment",
+  "Gift",
+  "Other",
+]);
+
+export const CategoryEnum = z.union([ExpenseCategoryEnum, IncomeCategoryEnum]);
+
