@@ -16,8 +16,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from "@/components/dialog";
+import { Button } from "@/components/button";
 import {
   Field,
   FieldContent,
@@ -26,23 +26,19 @@ import {
   FieldGroup,
   FieldLabel,
   FieldSet,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+} from "@/components/field";
+import { Input } from "@/components/input";
+import { Textarea } from "@/components/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@/components/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/popover";
 import { CalendarIcon, Loader2 } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
+import { Calendar } from "@/components/calendar";
 import { NewExpenseFormSchema } from "../../schema/expense";
 
 const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
