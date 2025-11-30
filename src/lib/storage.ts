@@ -1,40 +1,62 @@
 import { Account } from "@/domains/accounts/model/account";
 import { NewTransaction, Transaction } from "@/domains/transactions/model/transaction";
-import { ExpenseArraySchema } from "@/domains/transactions/schema/expense";
+import { TransactionArraySchema } from "@/domains/transactions/schema/transaction";
 
+const LOCAL_STORAGE_KEY = "finna_transactions"
 
 export const storage = {
 
-  // Transactions
-  getTransactions: ():Transaction[] => {
-      if (typeof window === "undefined") return [];
+  getTransactions: (): Transaction[] => {
+    if (typeof window === "undefined") return [];
     try {
-      const raw = JSON.parse(localStorage.getItem("finna_transactions") || "[]");
-      return ExpenseArraySchema.parse(raw);
-    } catch {
+      const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (!raw || raw === "[]") return [];
+      
+      const parsed = JSON.parse(raw);
+      
+      const withDates = parsed.map((t: any) => ({
+        ...t,
+        date: new Date(t.date),
+      }));
+      
+      const res = TransactionArraySchema.parse(withDates);
+      return res;
+    } catch (error) {
+      console.error("Error loading transactions:", error);
       return [];
     }
   },
 
- addTransaction: (transaction: NewTransaction): void => {
-    const expenses = storage.getTransactions();
-    const newTransaction = {
-      ...transaction,
-      id: crypto.randomUUID(),
-    };
-    expenses.push(newTransaction);
-    localStorage.setItem("finna_transactions", JSON.stringify(expenses));
+  addTransaction: (transaction: NewTransaction): void => {
+    if (typeof window === "undefined") return;
+    
+    try {
+      const newTransaction: Transaction = {
+        id: crypto.randomUUID(),
+        ...transaction
+      }
+      const existing = localStorage.getItem(LOCAL_STORAGE_KEY);
+      const transactions = existing ? JSON.parse(existing) : [];
+      
+      const updated = [...transactions, newTransaction];
+      
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
+      
+      console.log("Saved transactions:", updated.length);
+    } catch (error) {
+      console.error("Error saving transaction:", error);
+    }
   },
 
 
   deleteTransaction: (id: string): void => {
     const expenses = storage.getTransactions().filter((e) => e.id !== id);
-    localStorage.setItem("finna_transactions", JSON.stringify(expenses));
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(expenses));
   },
 
   deleteTransactions: (ids: string[]): void => {
     const expenses = storage.getTransactions().filter((e) => !ids.includes(e.id));
-    localStorage.setItem("finna_transactions", JSON.stringify(expenses));
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(expenses));
   },
 
   // Accounts

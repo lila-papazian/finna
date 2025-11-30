@@ -45,8 +45,9 @@ import {
   CollapsibleTrigger,
 } from "@/components/collapsible";
 import { ChevronDown, ChevronsUpDown } from "lucide-react";
-import { DEFAULT_CATEGORIES } from "@/lib/constants/categories";
 import { Transaction } from "@/domains/transactions/model/transaction";
+import { DEFAULT_INCOMES_CATEGORIES } from "@/lib/constants/default-incomes-categories";
+import { DEFAULT_EXPENSES_CATEGORIES } from "@/lib/constants/default-expenses-categories";
 
 type DateFilter = "this-month" | "last-month" | "custom" | "all";
 
@@ -164,9 +165,9 @@ export function DataTable({ data, accounts }: DataTableProps) {
 
   return (
     <div className="w-full space-y-4">
-      {/* Filters Section */}
       <div className="bg-white rounded-lg border p-4 space-y-4">
-        <Collapsible>
+        {/* Filters Section */}
+        {/* <Collapsible>
           <CollapsibleTrigger className="flex items-center">
             <h3 className="text-lg font-semibold">Filters</h3>
             <Button variant="ghost" size="icon" className="size-8">
@@ -206,7 +207,6 @@ export function DataTable({ data, accounts }: DataTableProps) {
               </Button>
             </div>
 
-            {/* Custom Date Range */}
             {dateFilter === "custom" && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -228,9 +228,7 @@ export function DataTable({ data, accounts }: DataTableProps) {
               </div>
             )}
 
-            {/* Filter Grid */}
             <div className="grid grid-flow-col auto-cols-min md:auto-cols-min gap-4 py-8">
-              {/* Category Filter */}
               <div>
                 <Label className="py-2">Category</Label>
                 <Select
@@ -242,7 +240,7 @@ export function DataTable({ data, accounts }: DataTableProps) {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Categories</SelectItem>
-                    {DEFAULT_CATEGORIES.map((cat) => (
+                    {[...DEFAULT_INCOMES_CATEGORIES, DEFAULT_EXPENSES_CATEGORIES].map((cat) => (
                       <SelectItem key={cat.key} value={cat.key}>
                         {cat.label}
                       </SelectItem>
@@ -251,7 +249,6 @@ export function DataTable({ data, accounts }: DataTableProps) {
                 </Select>
               </div>
 
-              {/* Currency Filter */}
               <div>
                 <Label className="py-2">Currency</Label>
                 <Select
@@ -269,7 +266,6 @@ export function DataTable({ data, accounts }: DataTableProps) {
                 </Select>
               </div>
 
-              {/* Account Filter */}
               <div>
                 <Label className="py-2">Account</Label>
                 <Select value={accountFilter} onValueChange={setAccountFilter}>
@@ -288,7 +284,6 @@ export function DataTable({ data, accounts }: DataTableProps) {
               </div>
             </div>
 
-            {/* Search by Description */}
             <div>
               <Label className="py-2">Search by Description</Label>
               <Input
@@ -306,13 +301,11 @@ export function DataTable({ data, accounts }: DataTableProps) {
               />
             </div>
           </CollapsibleContent>
-        </Collapsible>
-        {/* Results Summary */}
-        <div className="text-sm text-muted-foreground">
+        </Collapsible> */}
+        {/* <div className="text-sm text-muted-foreground">
           Showing {filteredData.length} of {data.length} expenses
-        </div>
-        {/* Column Visibility Toggle */}
-        <div className="flex items-center justify-between">
+        </div> */}
+        {/* <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
             {table.getFilteredSelectedRowModel().rows.length} of{" "}
             {table.getFilteredRowModel().rows.length} row(s) selected
@@ -339,7 +332,7 @@ export function DataTable({ data, accounts }: DataTableProps) {
               })}
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
+        </div> */}
 
         {/* Table */}
         <div className="rounded-md border overflow-hidden">

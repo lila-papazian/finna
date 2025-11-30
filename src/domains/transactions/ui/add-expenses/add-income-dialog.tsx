@@ -1,10 +1,8 @@
 "use client";
 import { Controller, useForm } from "react-hook-form";
 import { format } from "date-fns";
-import { DEFAULT_CATEGORIES } from "@/lib/constants/categories";
 import { DEFAULT_CURRENCIES } from "@/lib/constants/currencies";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 
 import {
   Dialog,
@@ -38,18 +36,19 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/popover";
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { Calendar } from "@/components/calendar";
 import { NewIncomeFormSchema } from "@/domains/transactions/schema/income";
-import { NewIncome, NewIncomeForm } from "@/domains/transactions/model/income";
-import { storage } from "@/lib/storage";
+import { NewIncomeForm } from "@/domains/transactions/model/income";
+import { DEFAULT_INCOMES_CATEGORIES } from "@/lib/constants/default-incomes-categories";
+import { Account } from "@/domains/accounts/model/account";
+import { useState } from "react";
 
-const AddIncomeDialog = ({ trigger }: { trigger: React.ReactNode }) => {
+interface Props {
+  onSubmit: (expense: NewIncomeForm) => void;
+  accounts: Account[];
+  currencies: typeof DEFAULT_CURRENCIES;
+}
+
+const AddIncomeDialog = ({ onSubmit, accounts, currencies }: Props) => {
   const [open, setOpen] = useState(false);
-
-  const handleOpenChange = (open: boolean) => {
-    setOpen(open);
-    if (!open) {
-      reset();
-    }
-  };
 
   const {
     handleSubmit,
@@ -70,28 +69,23 @@ const AddIncomeDialog = ({ trigger }: { trigger: React.ReactNode }) => {
     },
   });
 
-  async function onSubmit(data: NewIncomeForm) {
-    const newIncome: NewIncome = {
-      type: "income",
-      amount: parseFloat(data.amount),
-      currency: data.currency!,
-      category: data.category!,
-      accountId: data.accountId!,
-      description: data.description?.trim() || undefined,
-      date: data.date!,
+  const handleOpenChange = (open: boolean) => {
+      setOpen(open);
+      if (!open) {
+        reset();
+      }
     };
-    storage.addIncome(newIncome);
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        resolve();
-        handleOpenChange(false);
-      }, 2000);
-    });
-  }
+  
+    const handleFormSubmit = async (data: NewIncomeForm) => {
+      onSubmit(data);
+      reset();
+    };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogTrigger asChild>
+        <Button variant="outline">Add Income</Button>
+      </DialogTrigger>
       <DialogContent className="max-h-[80vh] max-w-[80vw] overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-80">
         <DialogHeader>
           <DialogTitle>Add Income</DialogTitle>
@@ -101,7 +95,7 @@ const AddIncomeDialog = ({ trigger }: { trigger: React.ReactNode }) => {
         </DialogHeader>
 
         {/* Form with submit handler */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
           <FieldSet>
             <FieldGroup>
               <Controller
@@ -178,7 +172,7 @@ const AddIncomeDialog = ({ trigger }: { trigger: React.ReactNode }) => {
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        {DEFAULT_CURRENCIES.map((c) => (
+                        {currencies.map((c) => (
                           <SelectItem key={c} value={c}>
                             {c}
                           </SelectItem>
@@ -222,7 +216,7 @@ const AddIncomeDialog = ({ trigger }: { trigger: React.ReactNode }) => {
                         <SelectValue placeholder="Choose a category" />
                       </SelectTrigger>
                       <SelectContent>
-                        {DEFAULT_CATEGORIES.map((category) => (
+                        {DEFAULT_INCOMES_CATEGORIES.map((category) => (
                           <SelectItem key={category.key} value={category.key}>
                             {category.label}
                           </SelectItem>
@@ -268,9 +262,13 @@ const AddIncomeDialog = ({ trigger }: { trigger: React.ReactNode }) => {
                         <SelectValue placeholder="Choose account" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="account-1">Account 1</SelectItem>
-                        <SelectItem value="account-2">Account 2</SelectItem>
-                        <SelectItem value="account-3">Account 3</SelectItem>
+                        {accounts.map((account) => {
+                          return (
+                            <SelectItem key={account.id} value={account.id}>
+                              {account.name}
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                     {fieldState.error && (
@@ -383,9 +381,7 @@ const AddIncomeDialog = ({ trigger }: { trigger: React.ReactNode }) => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => {
-                handleOpenChange(false);
-              }}
+              onClick={() => handleOpenChange(false)}
               className="transition-colors hover:bg-neutral-200 dark:hover:bg-neutral-800"
             >
               Cancel

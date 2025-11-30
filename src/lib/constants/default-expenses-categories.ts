@@ -1,4 +1,5 @@
-export const DEFAULT_CATEGORIES = [
+export const DEFAULT_EXPENSES_CATEGORIES = [
+  {key: "bills", label: "Bills"},
   {key: "clothing", label: "Clothing"},
   {key: "dining-out", label: "Dining Out"},
   {key: "education", label: "Education"},
@@ -20,4 +21,4 @@ export const DEFAULT_CATEGORIES = [
   {key: "other", label: "Other"},
 ] as const;
 
-export type Category = typeof DEFAULT_CATEGORIES[number];
+export const expenseKeys = DEFAULT_EXPENSES_CATEGORIES.map(c => c.key);

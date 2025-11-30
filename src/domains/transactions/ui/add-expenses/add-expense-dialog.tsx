@@ -1,10 +1,8 @@
-"use client";
+"use client"
 import { Controller, useForm } from "react-hook-form";
 import { format } from "date-fns";
-import { DEFAULT_CATEGORIES } from "@/lib/constants/categories";
 import { DEFAULT_CURRENCIES } from "@/lib/constants/currencies";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
 
 import {
   Dialog,
@@ -38,26 +36,30 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/popover";
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { Calendar } from "@/components/calendar";
 import { NewExpenseFormSchema } from "../../schema/expense";
-import { NewExpense, NewExpenseForm } from "../../model/expense";
-import { storage } from "@/lib/storage";
+import { NewExpenseForm } from "../../model/expense";
 import { DevTool } from "@hookform/devtools";
+import { DEFAULT_EXPENSES_CATEGORIES } from "@/lib/constants/default-expenses-categories";
+import { Account } from "@/domains/accounts/model/account";
+import { useState } from "react";
 
-const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
+interface Props {
+
+  onSubmit: (expense: NewExpenseForm) => void;
+  accounts: Account[];
+  currencies: typeof DEFAULT_CURRENCIES;
+}
+
+const AddExpenseDialog = ({
+  onSubmit,
+  accounts,
+  currencies,
+}: Props) => {
   const [open, setOpen] = useState(false);
-
-  const handleOpenChange = (open: boolean) => {
-    setOpen(open);
-    if (!open) {
-      reset();
-    }
-  };
-
   const {
     handleSubmit,
-    formState: { isSubmitting, isValid, errors, },
+    formState: { isSubmitting, isValid },
     control,
     reset,
-    watch
   } = useForm<NewExpenseForm>({
     resolver: zodResolver(NewExpenseFormSchema),
     mode: "onTouched",
@@ -72,34 +74,24 @@ const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
     },
   });
 
-  useEffect(() => {
-    console.log("Form errors:", errors);
-    console.log("Form values:", watch());
-    console.log("Is valid:", isValid);
-  }, [errors, isValid, watch])
 
-  async function onSubmit(data: NewExpenseForm) {
-    const newIncome: NewExpense = {
-      type: "expense",
-      amount: parseFloat(data.amount),
-      currency: data.currency!,
-      category: data.category!,
-      accountId: data.accountId!,
-      description: data.description?.trim() || undefined,
-      date: data.date!,
-    };
-    storage.addTransaction(newIncome);
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        resolve();
-        handleOpenChange(false);
-      }, 2000);
-    });
-  }
+  const handleOpenChange = (open: boolean) => {
+    setOpen(open);
+    if (!open) {
+      reset();
+    }
+  };
+
+  const handleFormSubmit = async (data: NewExpenseForm) => {
+    onSubmit(data);
+    reset();
+  };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogTrigger asChild>
+        <Button variant="outline">Add Expense</Button>
+      </DialogTrigger>
       <DialogContent className="max-h-[80vh] max-w-[80vw] overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-80">
         <DialogHeader>
           <DialogTitle>Add Expense</DialogTitle>
@@ -109,7 +101,7 @@ const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
         </DialogHeader>
 
         {/* Form with submit handler */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
           <FieldSet>
             <FieldGroup>
               <Controller
@@ -186,7 +178,7 @@ const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        {DEFAULT_CURRENCIES.map((c) => (
+                        {currencies.map((c) => (
                           <SelectItem key={c} value={c}>
                             {c}
                           </SelectItem>
@@ -230,7 +222,7 @@ const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
                         <SelectValue placeholder="Choose a category" />
                       </SelectTrigger>
                       <SelectContent>
-                        {DEFAULT_CATEGORIES.map((category) => (
+                        {DEFAULT_EXPENSES_CATEGORIES.map((category) => (
                           <SelectItem key={category.key} value={category.key}>
                             {category.label}
                           </SelectItem>
@@ -276,9 +268,13 @@ const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
                         <SelectValue placeholder="Choose account" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="account-1">Account 1</SelectItem>
-                        <SelectItem value="account-2">Account 2</SelectItem>
-                        <SelectItem value="account-3">Account 3</SelectItem>
+                        {accounts.map((account) => {
+                          return (
+                            <SelectItem key={account.id} value={account.id}>
+                              {account.name}
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                     {fieldState.error && (
@@ -391,9 +387,7 @@ const AddExpenseDialog = ({ trigger }: { trigger: React.ReactNode }) => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => {
-                handleOpenChange(false);
-              }}
+              onClick={() => handleOpenChange(false)}
               className="transition-colors hover:bg-neutral-200 dark:hover:bg-neutral-800"
             >
               Cancel
